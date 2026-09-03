@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#101513"/>
+      <stop offset="1" stop-color="#1f2c27"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(310 160) rotate(62) scale(430 520)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#315d50" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#101513" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity=".42"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <path d="M0 562C253 515 460 612 730 572c185-27 319-72 470-34v92H0Z" fill="#0b0f0e" opacity=".5"/>
+
+  <g transform="translate(78 68)">
+    <circle cx="23" cy="23" r="20" fill="none" stroke="#264b40" stroke-width="9"/>
+    <circle cx="23" cy="23" r="13" fill="none" stroke="#eee7d7" stroke-width="2"/>
+    <text x="60" y="34" fill="#eeeae1" font-family="Georgia, serif" font-size="35" font-weight="700" letter-spacing="7">NARD</text>
+  </g>
+
+  <g transform="translate(78 183)" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <text fill="#eeeae1" font-family="Georgia, serif" font-size="72" font-weight="700">
+      <tspan x="0" y="0">Play. Compare.</tspan>
+      <tspan x="0" y="82">Improve.</tspan>
+    </text>
+    <text x="2" y="159" fill="#aeb8b2" font-size="25">
+      <tspan x="2" y="159">Free browser backgammon with instant</tspan>
+      <tspan x="2" y="194">WildBG equity analysis for every move.</tspan>
+    </text>
+    <g transform="translate(0 239)" font-size="16" font-weight="700">
+      <rect width="138" height="42" rx="21" fill="#e5b94e"/>
+      <text x="69" y="27" text-anchor="middle" fill="#101513">PLAY FREE</text>
+      <rect x="151" width="189" height="42" rx="21" fill="none" stroke="#4d6159"/>
+      <text x="245" y="27" text-anchor="middle" fill="#d9dfdb">NO DOWNLOAD</text>
+    </g>
+  </g>
+
+  <g transform="translate(678 54) rotate(2 226 261)" filter="url(#shadow)">
+    <rect width="452" height="522" rx="18" fill="#322720" stroke="#e5b94e" stroke-width="3"/>
+    <rect x="18" y="18" width="416" height="486" rx="7" fill="#756a52"/>
+    <rect x="209" y="18" width="34" height="486" fill="#171b19"/>
+
+    <path d="M28 18h52L54 206Zm59 0h52l-26 188Zm59 0h52l-26 188Zm107 0h52l-26 188Zm59 0h52l-26 188Zm59 0h52l-26 188Z" fill="#98564d"/>
+    <path d="M54 504 28 316h52Zm59 0L87 316h52Zm59 0-26-188h52Zm107 0-26-188h52Zm59 0-26-188h52Zm59 0-26-188h52Z" fill="#264b40"/>
+
+    <g fill="#eee7d7" stroke="#a99d89" stroke-width="3">
+      <circle cx="54" cy="453" r="24"/><circle cx="54" cy="412" r="24"/><circle cx="54" cy="371" r="24"/>
+      <circle cx="172" cy="69" r="24"/><circle cx="172" cy="110" r="24"/>
+      <circle cx="338" cy="453" r="24"/><circle cx="338" cy="412" r="24"/><circle cx="338" cy="371" r="24"/>
+    </g>
+    <g fill="#163129" stroke="#426b5e" stroke-width="3">
+      <circle cx="113" cy="69" r="24"/><circle cx="113" cy="110" r="24"/><circle cx="113" cy="151" r="24"/>
+      <circle cx="397" cy="453" r="24"/><circle cx="397" cy="412" r="24"/>
+      <circle cx="279" cy="69" r="24"/><circle cx="279" cy="110" r="24"/><circle cx="279" cy="151" r="24"/>
+    </g>
+
+    <g transform="translate(179 225)">
+      <rect width="47" height="47" rx="9" fill="#eee7d7"/>
+      <circle cx="14" cy="14" r="4" fill="#101513"/><circle cx="33" cy="33" r="4" fill="#101513"/>
+      <rect x="56" width="47" height="47" rx="9" fill="#eee7d7"/>
+      <circle cx="69" cy="13" r="4" fill="#101513"/><circle cx="91" cy="13" r="4" fill="#101513"/><circle cx="69" cy="35" r="4" fill="#101513"/><circle cx="91" cy="35" r="4" fill="#101513"/>
+    </g>
+  </g>
+
+  <g transform="translate(598 441)" filter="url(#shadow)" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+    <rect width="240" height="112" rx="13" fill="#202825" stroke="#3b4943"/>
+    <text x="20" y="29" fill="#8f9c96" font-size="13" font-weight="700" letter-spacing="2">WILDBG ANALYSIS</text>
+    <circle cx="31" cy="64" r="11" fill="#264b40" stroke="#e5b94e" stroke-width="2"/>
+    <text x="52" y="71" fill="#eeeae1" font-size="22" font-weight="750">Best move</text>
+    <text x="20" y="96" fill="#aeb8b2" font-size="14">24/18  13/11 · +0.137</text>
+  </g>
+</svg>

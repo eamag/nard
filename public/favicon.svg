@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Nard backgammon board">
+  <rect width="128" height="128" rx="28" fill="#101513"/>
+  <rect x="16" y="15" width="96" height="98" rx="10" fill="#322720" stroke="#e5b94e" stroke-width="3"/>
+  <rect x="24" y="23" width="80" height="82" rx="3" fill="#756a52"/>
+  <path d="M28 24h20L38 61Zm24 0h20L62 61Zm24 0h20L86 61Z" fill="#98564d"/>
+  <path d="M38 104 28 67h20Zm24 0L52 67h20Zm24 0L76 67h20Z" fill="#264b40"/>
+  <rect x="59" y="22" width="10" height="84" rx="2" fill="#171b19"/>
+  <circle cx="39" cy="73" r="13" fill="#eee7d7" stroke="#101513" stroke-width="4"/>
+  <circle cx="88" cy="53" r="13" fill="#264b40" stroke="#eee7d7" stroke-width="3"/>
+</svg>

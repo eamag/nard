@@ -1,0 +1,41 @@
+---
+const homeURL = new URL('/', Astro.site!);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
+		<meta name="theme-color" content="#101513" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>Page not found — Nard</title>
+		<style>
+			:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background: #101513; }
+			body { min-height: 100vh; display: grid; place-items: center; margin: 0; color: #eeeae1; background: radial-gradient(circle at 50% 20%, #26342f, #101513 54%); }
+			main { width: min(34rem, calc(100% - 2rem)); text-align: center; }
+			.checker { width: 4.5rem; aspect-ratio: 1; display: grid; place-items: center; margin: 0 auto 1.5rem; border: 0.6rem solid #264b40; border-radius: 50%; box-shadow: inset 0 0 0 0.15rem #eee7d7, 0 1rem 2.5rem #0007; }
+			.checker::after { content: '4'; font: 700 1.6rem Georgia, serif; }
+			h1 { margin: 0; font: 700 clamp(2rem, 8vw, 4rem)/1 Georgia, serif; }
+			p { margin: 1rem auto 1.75rem; max-width: 27rem; color: #aeb8b2; line-height: 1.6; }
+			a { display: inline-block; padding: 0.8rem 1.1rem; border-radius: 0.4rem; color: #101513; background: #e5b94e; font-weight: 800; text-decoration: none; }
+			a:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+			@media (prefers-color-scheme: light) {
+				:root { background: #f0ece4; }
+				body { color: #27312d; background: radial-gradient(circle at 50% 20%, #e2ded2, #f0ece4 54%); }
+				.checker { border-color: #356959; box-shadow: inset 0 0 0 0.15rem #faf3e5, 0 1rem 2.5rem #0002; }
+				p { color: #68736d; }
+				a:focus-visible { outline-color: #27312d; }
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<div class="checker" aria-hidden="true"></div>
+			<h1>Point not found</h1>
+			<p>This play is off the board. Return to Nard and start a new game against WildBG.</p>
+			<a href={homeURL}>Back to the board</a>
+		</main>
+	</body>
+</html>

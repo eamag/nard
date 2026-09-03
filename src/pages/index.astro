@@ -1,0 +1,105 @@
+---
+import Nard from '../components/Nard.svelte';
+
+const title = 'Nard: Free Backgammon with WildBG Analysis';
+const description = 'Play free browser backgammon against WildBG and compare every legal move with instant equity, win-rate, mistake, and blunder analysis.';
+const canonicalURL = new URL(Astro.url.pathname, Astro.site!);
+const socialImageURL = new URL('/og-image.png', Astro.site!);
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@type': 'SoftwareApplication',
+	name: 'Nard',
+	applicationCategory: ['GameApplication', 'EducationalApplication'],
+	operatingSystem: 'Any',
+	url: canonicalURL.href,
+	description,
+	image: socialImageURL.href,
+	isAccessibleForFree: true,
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="application-name" content="Nard" />
+		<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" content="#101513" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="canonical" href={canonicalURL} />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#264b40" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:site_name" content="Nard" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:image" content={socialImageURL} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:type" content="image/png" />
+		<meta property="og:image:alt" content="Nard backgammon board with WildBG move analysis" />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={socialImageURL} />
+		<meta name="twitter:image:alt" content="Nard backgammon board with WildBG move analysis" />
+
+		<meta name="generator" content={Astro.generator} />
+		<script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')}></script>
+		<script is:inline>
+			try {
+				const savedTheme = localStorage.getItem('nard:theme-mode');
+				const mode = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
+				const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+				document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+				document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#101513' : '#f0ece4');
+			} catch {
+				// Use the dark CSS fallback when browser storage is unavailable.
+			}
+		</script>
+	</head>
+	<body>
+		<Nard client:load />
+		<noscript>
+			<p class="noscript-message">Nard needs JavaScript and WebAssembly enabled to run the WildBG backgammon engine.</p>
+		</noscript>
+	</body>
+</html>
+
+<style>
+	.noscript-message {
+		position: fixed;
+		inset: auto 1rem 1rem;
+		z-index: 100;
+		margin: 0 auto;
+		max-width: 42rem;
+		padding: 0.9rem 1rem;
+		border: 1px solid #876f34;
+		border-radius: 0.5rem;
+		color: #eeeae1;
+		background: #19201e;
+		font: 600 0.9rem/1.5 system-ui, sans-serif;
+	}
+</style>

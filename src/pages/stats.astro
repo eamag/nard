@@ -1,0 +1,63 @@
+---
+import StatsDashboard from '../components/StatsDashboard.svelte';
+
+const title = 'Your Backgammon Statistics — Nard';
+const description = 'Track games, wins, points, streaks, checker-play error, cube decisions, mistakes, blunders, and recent progress against WildBG.';
+const canonicalURL = new URL(Astro.url.pathname, Astro.site!);
+const socialImageURL = new URL('/og-image.png', Astro.site!);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="application-name" content="Nard" />
+		<meta name="robots" content="index, follow, max-image-preview:large" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" content="#101513" />
+
+		<link rel="canonical" href={canonicalURL} />
+		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Nard" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:image" content={socialImageURL} />
+		<meta property="og:image:alt" content="Nard backgammon board with WildBG move analysis" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={socialImageURL} />
+		<meta name="generator" content={Astro.generator} />
+
+		<script is:inline>
+			try {
+				const savedTheme = localStorage.getItem('nard:theme-mode');
+				const mode = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
+				const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+				document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+				document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#101513' : '#f0ece4');
+			} catch {
+				// Use the dark CSS fallback when browser storage is unavailable.
+			}
+		</script>
+	</head>
+	<body>
+		<StatsDashboard client:load />
+		<noscript><p class="noscript-message">Nard needs JavaScript enabled to show statistics stored in this browser.</p></noscript>
+	</body>
+</html>
+
+<style>
+	.noscript-message { position: fixed; inset: auto 1rem 1rem; z-index: 100; margin: 0 auto; max-width: 42rem; padding: .9rem 1rem; border: 1px solid #876f34; border-radius: .5rem; color: #eeeae1; background: #19201e; font: 600 .9rem/1.5 system-ui, sans-serif; }
+</style>
