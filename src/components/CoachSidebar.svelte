@@ -63,16 +63,16 @@
               : `−${Math.round(review.loss * 1000)} mp`}
         </strong>
       </div>
-      <p>{explainMove(review, onePointer, isP2)}</p>
+      <p>{explainMove(review, onePointer, review.isPlayer2)}</p>
       <div class="comparison">
         <button onclick={() => onTogglePreview(review!.chosen)}>
           <small>YOU PLAYED</small>
-          <b>{boardNotation(review.chosen.play, isP2)}</b>
+          <b>{boardNotation(review.chosen.play, review.isPlayer2)}</b>
           <span>{formatEquity(review.chosen.equity)}</span>
         </button>
         <button onclick={() => onTogglePreview(review!.best)}>
           <small>WILDBG</small>
-          <b>{boardNotation(review.best.play, isP2)}</b>
+          <b>{boardNotation(review.best.play, review.isPlayer2)}</b>
           <span>{formatEquity(review.best.equity)}</span>
         </button>
       </div>

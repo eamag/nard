@@ -324,7 +324,7 @@
     const chosen = completeMove;
     const best = candidates[0];
     const loss = Math.max(0, best.score - chosen.score);
-    review = { chosen, best, loss, phase };
+    review = { chosen, best, loss, phase, isPlayer2: isP2 };
     showRanking = true;
 
     if (playerMode === 'ai') {

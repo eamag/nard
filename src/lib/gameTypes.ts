@@ -29,6 +29,8 @@ export type Review = {
   best: Candidate;
   loss: number;
   phase: string;
+  /** Side that made the move, so its plays render in that board's own numbering. */
+  isPlayer2: boolean;
 };
 
 export type CubeDecision = {
