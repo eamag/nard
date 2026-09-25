@@ -3,6 +3,7 @@ import {
   applyBotStep,
   getOffCount,
   getPipCount,
+  isFinalBoard,
   notation,
   pointName,
   START_BOARD,
@@ -73,5 +74,36 @@ describe('boardUtils', () => {
     expect(switched.length).toBe(26);
     expect(getPipCount(switched, 'human')).toBe(167);
     expect(getPipCount(switched, 'bot')).toBe(167);
+  });
+
+  it('detects pure bearoff races and rejects positions with contact or bar checkers', () => {
+    expect(isFinalBoard([...START_BOARD])).toBe(false);
+
+    // Human home 1-6, bot home 19-24: a race with nothing outside either home.
+    const race = Array(26).fill(0) as number[];
+    race[6] = 3;
+    race[5] = 2;
+    race[24] = -4;
+    race[23] = -3;
+    expect(isFinalBoard(race)).toBe(true);
+
+    // Human blot at 7 is outside its home, so the race is not pure.
+    const humanOutside = [...race];
+    humanOutside[7] = 1;
+    expect(isFinalBoard(humanOutside)).toBe(false);
+
+    // Bot blot at 18 is outside its home (19-24), so the race is not pure.
+    const botOutside = [...race];
+    botOutside[18] = -1;
+    expect(isFinalBoard(botOutside)).toBe(false);
+
+    // Either bar resets the race; human bar is index 25, bot bar is index 0.
+    const humanOnBar = [...race];
+    humanOnBar[25] = 1;
+    expect(isFinalBoard(humanOnBar)).toBe(false);
+
+    const botOnBar = [...race];
+    botOnBar[0] = -1;
+    expect(isFinalBoard(botOnBar)).toBe(false);
   });
 });

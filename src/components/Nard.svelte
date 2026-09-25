@@ -41,6 +41,7 @@
     applyBotStep,
     generateMoveArrows,
     getPipCount,
+    isFinalBoard,
     notation,
     pointName,
     START_BOARD,
@@ -48,6 +49,8 @@
     toInternalStep,
     toPhysicalStep,
   } from '../lib/boardUtils';
+  import { playAutoFinish } from '../lib/autoFinish';
+  import { isBusyState, winnerLabelFor } from '../lib/gameHelpers';
   import {
     calculatePlayerDieSlots,
     classifyGameResult,
@@ -82,6 +85,8 @@
   let physicalNextMoves: MoveStep[] = [];
   let sources: number[] = [];
   let targets: number[] = [];
+  let opponentActive = false;
+  let youActive = false;
   let completeMove: Candidate | null = null;
   let dice: [number, number] | null = null;
   let botDice: [number, number] | null = null;
@@ -115,6 +120,8 @@
   let thinkingOverlayTimer: ReturnType<typeof setTimeout> | null = null;
   let hintArrows: MoveArrow[] = [];
   let liveMessage = '';
+  let autoCancelRequested = false;
+  let autoStatus = '';
 
   $: isP2 = playerMode === 'pvp' && turn === 'player2';
   $: shownBoard = preview
@@ -144,7 +151,15 @@
     : botDice
       ? botDice.map((value) => ({ value, spent: false }))
       : [{ value: null, spent: false }, { value: null, spent: false }];
-  $: liveMessage = buildLiveMessage(state, winner, winnerPoints, playerMode, cubeOffer, cubeValue, dice, review, lastBotMove, onePointer);
+  $: liveMessage = buildLiveMessage(state, winner, winnerPoints, playerMode, cubeOffer, cubeValue, dice, review, lastBotMove, onePointer, autoStatus);
+  $: showAutoButton = state === 'ready' && engine !== null && isFinalBoard(board);
+  // Line highlight. In `auto` the lit line is the side whose roll is on screen,
+  // which is the side about to move: onTurn publishes the roll it plays next,
+  // so `botDice` is set only once it is WildBG's turn. `youActive` is defined
+  // as the negation so the two lines can never both light up.
+  $: opponentActive = state !== 'gameover'
+    && (playerMode === 'pvp' ? turn === 'player2' : state === 'bot' || (state === 'auto' && botDice !== null));
+  $: youActive = state !== 'gameover' && !opponentActive;
 
   onMount(async () => {
     try {
@@ -529,6 +544,91 @@
     await botTurn(false);
   }
 
+  function cancelAutoFinish() {
+    autoCancelRequested = true;
+  }
+
+  async function runAutoFinish() {
+    if (!engine || (state !== 'ready' && state !== 'moving')) return;
+    const activeEngine = engine;
+    // When launched mid-turn, reuse the already-rolled dice for the first
+    // auto move and discard any partial selection; `board` is still the
+    // committed turn-start position.
+    const firstDice = state === 'moving' ? dice : null;
+    let firstRollPending = firstDice !== null;
+    autoCancelRequested = false;
+    ensureGameStarted();
+    soundManager.playSound('confirm');
+    state = 'auto';
+    preview = null;
+    review = null;
+    candidates = [];
+    movePaths = [];
+    selectedSteps = [];
+    selectedSource = null;
+    botMotion = null;
+    autoStatus = 'Finishing automatically with best moves.';
+    await tick();
+
+    const startSide = playerMode === 'ai' ? 'human' : turn === 'player1' ? 'human' : 'bot';
+    try {
+      const outcome = await playAutoFinish(
+        board,
+        startSide,
+        {
+          rollDice: () => {
+            if (firstRollPending && firstDice) {
+              firstRollPending = false;
+              return [...firstDice] as [number, number];
+            }
+            return generateRandomDice();
+          },
+          analyze: async (position, dieOne, dieTwo) =>
+            (await activeEngine.analyze(Int8Array.from(position), dieOne, dieTwo, onePointer)) as Analysis,
+          getResult: async (physical) => activeEngine.result(Int8Array.from(physical)),
+        },
+        {
+          isCancelled: () => autoCancelRequested,
+          onTurn: async ({ board: nextBoard, mover, dice: rolled }) => {
+            board = [...nextBoard];
+            workingBoard = [...nextBoard];
+            if (mover === 'human') {
+              dice = rolled;
+              botDice = null;
+            } else {
+              botDice = rolled;
+              dice = null;
+            }
+            if (playerMode === 'pvp') turn = mover === 'human' ? 'player1' : 'player2';
+            autoStatus = `${winnerLabelFor(playerMode, mover)} rolled ${rolled[0]}-${rolled[1]}.`;
+            soundManager.playSound(mover === 'human' ? 'move' : 'bot-move');
+            await wait(450);
+          },
+        },
+      );
+
+      if (outcome.result !== 'ongoing' && outcome.lastMover) {
+        const winnerLabel = winnerLabelFor(playerMode, outcome.lastMover);
+        board = [...outcome.board];
+        workingBoard = [...outcome.board];
+        autoStatus = '';
+        finish(winnerLabel, outcome.result);
+        return;
+      }
+
+      // Stopped mid-race, either cancelled or out of turns. Hand the turn to
+      // whoever is on roll: `onTurn` left `turn` on the side that just moved,
+      // so in pvp the next player would otherwise be off by one.
+      state = 'ready';
+      dice = null;
+      botDice = null;
+      if (outcome.nextSide) turn = outcome.nextSide === 'bot' ? 'player2' : 'player1';
+      autoStatus = outcome.cancelled ? '' : 'Automatic finish ran out of turns. The game is still in progress.';
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
   function wait(ms: number) {
     return new Promise<void>((resolve) => setTimeout(resolve, ms));
   }
@@ -544,9 +644,13 @@
     moveReview: Review | null,
     botLabel: string,
     singlePoint: boolean,
+    autoLabel: string,
   ): string {
     if (currentState === 'gameover' && currentWinner) {
       return `${currentWinner} won ${points} ${points === 1 ? 'point' : 'points'}.`;
+    }
+    if (currentState === 'auto') {
+      return autoLabel || 'Finishing automatically with best moves.';
     }
     if (currentState === 'cube-offer') {
       const offerer = mode === 'pvp' ? (offer?.offeredBy === 'player1' ? 'Player 1' : 'Player 2') : 'WildBG';
@@ -564,7 +668,9 @@
         : `, ${singlePoint ? `${(moveReview.loss * 100).toFixed(1)} win-percent points lost` : `${Math.round(moveReview.loss * 1000)} millipoints lost`}.`;
       return `You played ${notation(moveReview.chosen.play)}: ${gradeLoss(moveReview.loss, singlePoint)}${lossDetail}`;
     }
-    return '';
+    // Reached when the auto finish stopped without ending the game; autoStatus
+    // is empty in every other state that falls through to here.
+    return autoLabel;
   }
 
   function finish(player: 'You' | 'WildBG' | 'Player 1' | 'Player 2', result: string) {
@@ -599,6 +705,7 @@
     dice = null;
     botDice = null;
     botMotion = null;
+    autoStatus = '';
   }
 
   function handleError(error: unknown) {
@@ -610,6 +717,8 @@
   function reset() {
     cancelThinkingOverlay();
     soundManager.playSound('reset');
+    autoCancelRequested = false;
+    autoStatus = '';
     board = [...START_BOARD];
     turnStart = [...START_BOARD];
     workingBoard = [...START_BOARD];
@@ -727,7 +836,7 @@
     {themeMode}
     {isDark}
     {muted}
-    canChangeSettings={!gameStartedAt && state !== 'moving' && state !== 'bot' && state !== 'thinking' && state !== 'cube-thinking' && state !== 'cube-offer'}
+    canChangeSettings={!gameStartedAt && !isBusyState(state)}
     onTogglePlayerMode={togglePlayerMode}
     onToggleScoreMode={toggleScoreMode}
     onCycleTheme={cycleTheme}
@@ -740,7 +849,7 @@
     <section class="game-column">
       <div
         class="player-line opponent-line"
-        class:active-turn={state !== 'gameover' && ((playerMode === 'ai' && state === 'bot') || (playerMode === 'pvp' && turn === 'player2'))}
+        class:active-turn={opponentActive}
       >
         <div class="player">
           <span class="player-disc bot-disc"></span>
@@ -785,7 +894,7 @@
 
       <div
         class="player-line you-line"
-        class:active-turn={state !== 'gameover' && ((playerMode === 'ai' && state !== 'bot') || (playerMode === 'pvp' && turn === 'player1'))}
+        class:active-turn={youActive}
       >
         <div class="player">
           <span class="player-disc human-disc"></span>
@@ -801,7 +910,7 @@
         <span class="pip"><small>PIPS</small>{getPipCount(shownBoard, 'human')}</span>
       </div>
 
-      {#if state === 'moving' || state === 'gameover' || state === 'error'}
+      {#if state === 'moving' || state === 'gameover' || state === 'error' || state === 'auto' || showAutoButton}
         <div class="controls guidance-hidden">
           <div class="control-buttons">
             {#if state === 'moving'}
@@ -821,10 +930,22 @@
                 </span>
                 <span>{showRanking ? 'Hide hint' : 'Hint'}</span>
               </button>
+              <button
+                class="secondary"
+                onclick={runAutoFinish}
+                title="Play out the rest of the game with WildBG best moves"
+              >
+                <span>Finish automatically</span>
+              </button>
             {:else if state === 'gameover'}
               <button class="primary" onclick={reset}>Play again</button>
             {:else if state === 'error'}
               <button class="primary" onclick={() => location.reload()}>Try again</button>
+            {:else if state === 'auto'}
+              <span class="auto-status" role="status">{autoStatus}</span>
+              <button class="secondary" onclick={cancelAutoFinish}>Cancel</button>
+            {:else if showAutoButton}
+              <button class="primary" onclick={runAutoFinish}>Finish automatically</button>
             {/if}
           </div>
         </div>
@@ -915,6 +1036,7 @@
   .hint-btn.active { border-color: var(--accent); color: var(--accent); }
   .hint-bulb { display: grid; place-items: center; }
   .hint-bulb svg { width: 13px; height: 13px; display: block; }
+  .auto-status { align-self: center; margin-right: auto; color: var(--muted); font-size: 11px; }
 
   :global(html[data-theme='light']) { background: #f0ece4; color-scheme: light; }
   :global(html[data-theme='light'] body) { color: #27312d; background: #f0ece4; }

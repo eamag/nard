@@ -70,6 +70,7 @@ export type GameState =
   | 'thinking'
   | 'moving'
   | 'bot'
+  | 'auto'
   | 'cube-thinking'
   | 'cube-offer'
   | 'gameover'

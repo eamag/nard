@@ -153,3 +153,21 @@ export function countBlots(position: number[]): number {
 export function countPointsMade(position: number[]): number {
   return position.slice(1, 25).filter((value) => value >= 2).length;
 }
+
+/**
+ * A "final board" is a pure bearoff race on the physical board: neither side
+ * has checkers on the bar or outside its home board, so no contact is possible.
+ * Human home is points 1-6 (bar at 25); bot / Player 2 home is physical
+ * points 19-24 (bar at 0). Borne-off checkers are implicit and always allowed.
+ */
+export function isFinalBoard(position: number[]): boolean {
+  if (position[25] > 0) return false;
+  if (position[0] < 0) return false;
+  for (let point = 7; point <= 24; point++) {
+    if (position[point] > 0) return false;
+  }
+  for (let point = 1; point <= 18; point++) {
+    if (position[point] < 0) return false;
+  }
+  return true;
+}
