@@ -747,9 +747,9 @@
     state = engine ? 'ready' : 'loading';
   }
 
-  function togglePlayerMode() {
-    if (gameStartedAt) return;
-    playerMode = playerMode === 'ai' ? 'pvp' : 'ai';
+  function setPlayerMode(mode: PlayerMode) {
+    if (gameStartedAt || mode === playerMode) return;
+    playerMode = mode;
     reset();
   }
 
@@ -837,7 +837,7 @@
     {isDark}
     {muted}
     canChangeSettings={!gameStartedAt && !isBusyState(state)}
-    onTogglePlayerMode={togglePlayerMode}
+    onSelectPlayerMode={setPlayerMode}
     onToggleScoreMode={toggleScoreMode}
     onCycleTheme={cycleTheme}
     onToggleMuted={toggleMuted}

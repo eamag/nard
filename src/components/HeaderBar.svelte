@@ -8,7 +8,7 @@
   export let muted: boolean;
   export let canChangeSettings: boolean;
 
-  export let onTogglePlayerMode: () => void;
+  export let onSelectPlayerMode: (mode: PlayerMode) => void;
   export let onToggleScoreMode: () => void;
   export let onCycleTheme: () => void;
   export let onToggleMuted: () => void;
@@ -22,13 +22,29 @@
       <span class="stats-icon" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="stats-link-label">Stats</span>
     </a>
-    <button
-      class="player-mode-button"
-      onclick={onTogglePlayerMode}
-      disabled={!canChangeSettings}
-      aria-label={`Player mode: ${playerMode === 'ai' ? 'vs WildBG' : '2 Players'}. Activate to switch.`}
-      title={!canChangeSettings ? 'Start a new game to change mode' : playerMode === 'ai' ? 'Switch to 2 Players (Pass & Play)' : 'Switch to vs WildBG'}
-    >{playerMode === 'ai' ? 'vs WildBG' : '2 Players'}</button>
+    <div
+      class="player-mode-options"
+      class:locked={!canChangeSettings}
+      role="group"
+      aria-label="Opponent"
+    >
+      <button
+        class="player-mode-option"
+        class:active={playerMode === 'ai'}
+        aria-pressed={playerMode === 'ai'}
+        disabled={!canChangeSettings}
+        onclick={() => onSelectPlayerMode('ai')}
+        title={!canChangeSettings ? 'Start a new game to change opponent' : 'Play against WildBG'}
+      >vs bot</button>
+      <button
+        class="player-mode-option"
+        class:active={playerMode === 'pvp'}
+        aria-pressed={playerMode === 'pvp'}
+        disabled={!canChangeSettings}
+        onclick={() => onSelectPlayerMode('pvp')}
+        title={!canChangeSettings ? 'Start a new game to change opponent' : 'Pass and play with two people'}
+      >2 players</button>
+    </div>
     <button
       class="score-mode-button"
       onclick={onToggleScoreMode}
@@ -133,7 +149,42 @@
   .stats-icon i:nth-child(1) { height: 4px; }
   .stats-icon i:nth-child(2) { height: 9px; }
   .stats-icon i:nth-child(3) { height: 6px; }
-  .player-mode-button,
+  .player-mode-options {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid #39433f;
+    border-radius: 999px;
+    background: #1a211e;
+    transition: opacity 0.18s ease;
+  }
+  .player-mode-options.locked {
+    opacity: 0.45;
+  }
+  .player-mode-option {
+    border: 0;
+    border-radius: 999px;
+    padding: 6px 13px;
+    background: transparent;
+    color: #8b9690;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+  .player-mode-option:hover:not(:disabled) {
+    color: #d7ded9;
+  }
+  .player-mode-option.active {
+    background: #4a3f24;
+    color: var(--accent, #e5b94e);
+  }
+  .player-mode-option:disabled {
+    cursor: default;
+  }
   .score-mode-button {
     border: 1px solid #39433f;
     border-radius: 999px;
@@ -144,7 +195,6 @@
     font-weight: 800;
     cursor: pointer;
   }
-  .player-mode-button:disabled,
   .score-mode-button:disabled {
     opacity: 0.45;
     cursor: default;
@@ -215,13 +265,16 @@
     fill: none;
   }
   .stats-link:focus-visible,
-  .player-mode-button:focus-visible,
   .score-mode-button:focus-visible,
   .theme-button:focus-visible,
   .sound-button:focus-visible,
   .quiet-button:focus-visible {
     outline: 2px solid #f3cc69;
     outline-offset: 3px;
+  }
+  .player-mode-option:focus-visible {
+    outline: 2px solid #f3cc69;
+    outline-offset: 2px;
   }
   .quiet-button {
     border: 1px solid #39433f;
@@ -249,7 +302,8 @@
     .header-actions {
       gap: 11px;
     }
-    .stats-link-label {
+    .stats-link-label,
+    .theme-label {
       display: none;
     }
     .stats-link {
@@ -258,11 +312,50 @@
     }
   }
 
+  /* Brand plus six controls stop fitting on one row, so actions get their own. */
+  @media (max-width: 560px) {
+    .app-header {
+      height: auto;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      gap: 10px;
+    }
+    .header-actions {
+      width: 100%;
+      justify-content: space-between;
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .player-mode-option {
+      padding: 6px 10px;
+      font-size: 10px;
+    }
+    .score-mode-button,
+    .quiet-button {
+      padding-inline: 10px;
+    }
+  }
+
   :global(html[data-theme='light']) .app-header {
     background: rgba(251, 248, 241, 0.96);
     border-color: #d7d3c8;
   }
-  :global(html[data-theme='light']) .player-mode-button,
+  :global(html[data-theme='light']) .player-mode-options {
+    border-color: #b7bcb4;
+    background: #eceae0;
+  }
+  :global(html[data-theme='light']) .player-mode-option {
+    color: #66726b;
+  }
+  :global(html[data-theme='light']) .player-mode-option:hover:not(:disabled) {
+    color: #16201b;
+  }
+  :global(html[data-theme='light']) .player-mode-option.active {
+    background: #e4d3a0;
+    color: #6d5312;
+  }
   :global(html[data-theme='light']) .score-mode-button {
     border-color: #b7bcb4;
     background: #f3efe6;
