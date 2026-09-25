@@ -75,6 +75,24 @@ export function notation(play: MoveStep[]): string {
 }
 
 /**
+ * Renders a play with the point numbers shown on the board. Engine plays use
+ * the viewer's own orientation, which for Player 2 is mirrored relative to the
+ * physical board, so its numbers have to be mapped back before display.
+ */
+export function boardNotation(play: MoveStep[], isPlayer2: boolean): string {
+  if (!play.length) return 'No move';
+  if (!isPlayer2) return notation(play);
+  // Once mapped, physical point 0 is Player 2's bar when a checker leaves it
+  // and the bear-off tray when a checker arrives, so the two reads differ.
+  return play
+    .map((step) => {
+      const physical = toPhysicalStep(step, true);
+      return `${physical.from === 0 ? 'bar' : physical.from}/${physical.to === 0 ? 'off' : physical.to}`;
+    })
+    .join(' ');
+}
+
+/**
  * Computes SVG coordinates for arrow endpoints on the backgammon board.
  */
 export function getArrowAnchor(point: number, isPlayer2 = false): { x: number; y: number } {

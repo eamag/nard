@@ -1,7 +1,7 @@
 import type { MoveStep } from './movePaths';
 import type { Candidate, DieSlot, Review } from './gameTypes';
 import type { GameResult } from './playerStats';
-import { countBlots, countPointsMade, notation } from './boardUtils';
+import { boardNotation, countBlots, countPointsMade } from './boardUtils';
 
 export function formatEquity(value: number): string {
   return `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(3)}`;
@@ -24,9 +24,9 @@ export function gradeLoss(loss: number, isOnePointer: boolean): string {
   return 'Blunder';
 }
 
-export function explainMove(review: Review, isOnePointer: boolean): string {
+export function explainMove(review: Review, isOnePointer: boolean, isPlayer2: boolean): string {
   if (review.loss < 0.003) {
-    return `You matched WildBG: ${notation(review.best.play)} is the top-ranked play.`;
+    return `You matched WildBG: ${boardNotation(review.best.play, isPlayer2)} is the top-ranked play.`;
   }
   const reasons: string[] = [];
   if (Math.abs(review.best.position[0]) > Math.abs(review.chosen.position[0])) {
@@ -48,7 +48,7 @@ export function explainMove(review: Review, isOnePointer: boolean): string {
   const amount = isOnePointer
     ? `${(review.loss * 100).toFixed(1)} win-percentage points`
     : `${Math.round(review.loss * 1000)} millipoints`;
-  return `${notation(review.best.play)} ${reasons.slice(0, 2).join(' and ')}. WildBG values it ${amount} higher.`;
+  return `${boardNotation(review.best.play, isPlayer2)} ${reasons.slice(0, 2).join(' and ')}. WildBG values it ${amount} higher.`;
 }
 
 export function calculatePlayerDieSlots(

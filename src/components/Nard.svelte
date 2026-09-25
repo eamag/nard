@@ -39,10 +39,10 @@
   } from '../lib/gameTypes';
   import {
     applyBotStep,
+    boardNotation,
     generateMoveArrows,
     getPipCount,
     isFinalBoard,
-    notation,
     pointName,
     START_BOARD,
     switchSides,
@@ -425,7 +425,7 @@
         board = [...workingBoard];
         soundManager.playSound('bot-move');
         played.push(step);
-        lastBotMove = notation(played);
+        lastBotMove = boardNotation(played, true);
         botMotion = { ...motion, stage: 'to' };
         await wait(380);
       }
@@ -666,7 +666,7 @@
       const lossDetail = moveReview.loss < 0.0005
         ? 'No loss.'
         : `, ${singlePoint ? `${(moveReview.loss * 100).toFixed(1)} win-percent points lost` : `${Math.round(moveReview.loss * 1000)} millipoints lost`}.`;
-      return `You played ${notation(moveReview.chosen.play)}: ${gradeLoss(moveReview.loss, singlePoint)}${lossDetail}`;
+      return `You played ${boardNotation(moveReview.chosen.play, isP2)}: ${gradeLoss(moveReview.loss, singlePoint)}${lossDetail}`;
     }
     // Reached when the auto finish stopped without ending the game; autoStatus
     // is empty in every other state that falls through to here.
@@ -965,6 +965,7 @@
       {stats}
       {onePointer}
       {revision}
+      {isP2}
       onToggleHints={toggleHints}
       onTogglePreview={togglePreview}
       onToggleHint={toggleHint}

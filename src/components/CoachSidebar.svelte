@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Candidate, CubeReview, GameState, Review } from '../lib/gameTypes';
   import { samePlay } from '../lib/movePaths';
-  import { notation } from '../lib/boardUtils';
+  import { boardNotation } from '../lib/boardUtils';
   import {
     explainMove,
     formatEquity,
@@ -21,6 +21,7 @@
   export let stats: { decisions: number; mistakes: number; blunders: number; loss: number };
   export let onePointer: boolean;
   export let revision: string;
+  export let isP2: boolean;
 
   export let onToggleHints: () => void;
   export let onTogglePreview: (candidate: Candidate) => void;
@@ -62,16 +63,16 @@
               : `−${Math.round(review.loss * 1000)} mp`}
         </strong>
       </div>
-      <p>{explainMove(review, onePointer)}</p>
+      <p>{explainMove(review, onePointer, isP2)}</p>
       <div class="comparison">
         <button onclick={() => onTogglePreview(review!.chosen)}>
           <small>YOU PLAYED</small>
-          <b>{notation(review.chosen.play)}</b>
+          <b>{boardNotation(review.chosen.play, isP2)}</b>
           <span>{formatEquity(review.chosen.equity)}</span>
         </button>
         <button onclick={() => onTogglePreview(review!.best)}>
           <small>WILDBG</small>
-          <b>{notation(review.best.play)}</b>
+          <b>{boardNotation(review.best.play, isP2)}</b>
           <span>{formatEquity(review.best.equity)}</span>
         </button>
       </div>
@@ -107,7 +108,7 @@
         >
           <span class="move">
             <i>{index + 1}</i>
-            <b>{notation(candidate.play)}</b>
+            <b>{boardNotation(candidate.play, isP2)}</b>
           </span>
           <span>{(candidate.probabilities.win * 100).toFixed(1)}%</span>
           <span>{formatEquity(candidate.equity)}</span>

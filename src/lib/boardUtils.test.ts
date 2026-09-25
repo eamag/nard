@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import {
   applyBotStep,
+  boardNotation,
   getOffCount,
   getPipCount,
   isFinalBoard,
@@ -67,6 +68,22 @@ describe('boardUtils', () => {
 
     expect(notation([{ from: 24, to: 21 }, { from: 13, to: 10 }])).toBe('24/21 13/10');
     expect(notation([])).toBe('No move');
+  });
+
+  it('renders Player 2 plays with the point numbers shown on the board', () => {
+    // Player 1 reads the engine's numbering directly.
+    expect(boardNotation([{ from: 24, to: 18 }, { from: 18, to: 13 }], false)).toBe('24/18 18/13');
+
+    // Player 2's engine view is mirrored: internal 8/4 is physical 17/21.
+    expect(boardNotation([{ from: 8, to: 4 }, { from: 4, to: 2 }], true)).toBe('17/21 21/23');
+
+    // Mapped to point 0, which reads as the bar on the way in and off on the
+    // way out, unlike Player 1's 25 and 0.
+    expect(boardNotation([{ from: 25, to: 22 }], true)).toBe('bar/3');
+    expect(boardNotation([{ from: 6, to: 0 }], true)).toBe('19/off');
+    expect(boardNotation([{ from: 25, to: 0 }], false)).toBe('bar/off');
+
+    expect(boardNotation([], true)).toBe('No move');
   });
 
   it('inverts and negates position on switchSides', () => {

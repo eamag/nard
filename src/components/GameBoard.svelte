@@ -3,10 +3,10 @@
   import type { CubeOwner } from '../lib/cubeRules';
   import type { MoveStep } from '../lib/movePaths';
   import {
+    boardNotation,
     BOTTOM_POINTS,
     getCheckerSlots,
     getOffCount,
-    notation,
     TOP_POINTS,
   } from '../lib/boardUtils';
 
@@ -114,7 +114,7 @@
           viewBox="0 0 1200 620"
           preserveAspectRatio="none"
           role="img"
-          aria-label={`Best move: ${notation(candidates[0].play)}`}
+          aria-label={`Best move: ${boardNotation(candidates[0].play, isP2)}`}
         >
           {#each hintArrows as arrow}
             <path class="move-arrow-line" d={arrow.path}></path>
@@ -221,7 +221,7 @@
 
     {#if preview}
       <button class="preview-pill" onclick={onClosePreview}>
-        Preview: {notation(preview.play)} <b>Close</b>
+        Preview: {boardNotation(preview.play, isP2)} <b>Close</b>
       </button>
     {/if}
 
